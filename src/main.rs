@@ -1,45 +1,29 @@
-use std::collections::{BTreeMap, HashMap};
-use collection::{Collection, Type};
+use core::{Collection, write::{Insert, InsertOptions}};
 use dados_pessoas::dados_pessoas;
+use std::time::Instant;
 mod dados_pessoas;
-mod collection;
+mod core;
 
 fn main() {
-    let mut pessoas = Collection::init("pessoas");
+    let mut pessoas = Collection::init("pessoas3");
 
-    let _ = pessoas.load_from_disk();
+    //let _ = pessoas.load_from_disk(p);
 
-    //pessoas.save_on_disk().unwrap();
+    let now = Instant::now();
 
-    let mut dados0 = &mut dados_pessoas(0);
+    let dados0 = dados_pessoas(5);
 
-    for i in dados0.drain(0..10) {
-        println!("tamanho de d: {}", i.len());
-        
-    }
+    println!("Finalização montagem de dados: {}", now.elapsed().as_secs());
 
-    println!("tamanho original de dados: {}", dados0.len());
+    println!("Existe {}", dados0.len());
 
-  //  let d = dados0.drain(0..10);
+    let mut options = InsertOptions::new(
+        "pessoas4".to_string(),
+        1024 * 10, // 10kb
+        dados0.len(),
+    );
 
+    let _ = Insert::insert_many(dados0, &mut options);
 
-
-
-    // let dados1 = dados_pessoas(3);
-    // let dados2 = dados_pessoas(1);
-    // let dados2 = dados_pessoas(2);
-    // let dados3 = dados_pessoas(4);
-
-    // dados0.extend(dados1);
-
-    // dados0.extend(dados2);
-
-    // dados0.extend(dados3);
-
-    // pessoas.insert_many(dados0.clone());
-
-    let dados = pessoas.get_data();
-    println!("Quantidade de pessoas: {}", dados.len());
-
-    //pessoas.inserir_muitos(dados1, dados2);
+    println!("Finalização do insert de dados: {}", now.elapsed().as_secs());
 }
