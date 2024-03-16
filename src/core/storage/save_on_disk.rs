@@ -1,4 +1,4 @@
-use std::fs::{OpenOptions};
+use std::{fs::OpenOptions, io::Write};
 use super::super::Document;
 use borsh::to_writer;
 use std::io;
@@ -11,9 +11,11 @@ pub fn save_on_disk(document: &Document, path: String) -> io::Result<()> {
         .create(true)
         .open(path)?;
 
-    let writer = io::BufWriter::new(file);
+    let mut writer = io::BufWriter::new(file);
 
-    to_writer(writer, document)?;
+    to_writer(&mut writer, document)?;
+
+    writer.flush()?;
 
     Ok(())
 }
